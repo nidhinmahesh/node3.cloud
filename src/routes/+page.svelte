@@ -62,7 +62,7 @@
 			<FlowMapperCanvas />
 		</main>
 	{:else}
-		<main class="flex-1 overflow-y-auto p-6">
+		<main class="flex-1 flex flex-col overflow-y-auto p-6">
 			<div class="flex items-center justify-end gap-2 mb-6">
 				<button
 					class="text-[10px] px-2 py-1 rounded border border-border text-text-muted hover:text-text hover:border-border-bright transition-colors"
@@ -92,6 +92,11 @@
 			{:else if workspace.activeTool === 'abi-encoder'}
 				<AbiEncoder />
 			{/if}
+
+			<footer class="mt-auto pt-12 pb-4 text-center">
+				<p class="text-[11px] text-text-dim leading-relaxed">Your personal web3 dev workbench — tools, history, and AI help, all saved in your browser.<br/>You don't need cloud for everything just like the name.</p>
+				<p class="text-[10px] text-text-muted mt-2">sponsored by <a href="https://getfexr.com" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">Fexr</a></p>
+			</footer>
 		</main>
 	{/if}
 
