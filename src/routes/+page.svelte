@@ -59,20 +59,31 @@
 
 	{#if workspace.activeTool === 'flow-mapper'}
 		<main class="flex-1 overflow-hidden">
+			<!-- mobile menu button for flow mapper -->
+			<button
+				class="fixed top-2 right-2 z-30 md:hidden text-[10px] px-2 py-1 rounded border border-border bg-bg-surface text-text-muted hover:text-text"
+				onclick={() => (workspace.sidebarOpen = true)}
+			>menu</button>
 			<FlowMapperCanvas />
 		</main>
 	{:else}
-		<main class="flex-1 flex flex-col overflow-y-auto p-6">
-			<div class="flex items-center justify-end gap-2 mb-6">
+		<main class="flex-1 flex flex-col overflow-y-auto p-3 md:p-6">
+			<div class="flex items-center gap-2 mb-4 md:mb-6">
 				<button
-					class="text-[10px] px-2 py-1 rounded border border-border text-text-muted hover:text-text hover:border-border-bright transition-colors"
-					onclick={handleExport}
-				>export</button>
-				<button
-					class="text-[10px] px-2 py-1 rounded border border-border text-text-muted hover:text-text hover:border-border-bright transition-colors"
-					onclick={handleImport}
-				>import</button>
-				<span class="text-[10px] text-text-muted">Cmd+K search</span>
+					class="md:hidden text-[10px] px-2 py-1 rounded border border-border text-text-muted hover:text-text hover:border-border-bright transition-colors"
+					onclick={() => (workspace.sidebarOpen = true)}
+				>menu</button>
+				<div class="flex items-center gap-2 ml-auto">
+					<button
+						class="text-[10px] px-2 py-1 rounded border border-border text-text-muted hover:text-text hover:border-border-bright transition-colors"
+						onclick={handleExport}
+					>export</button>
+					<button
+						class="text-[10px] px-2 py-1 rounded border border-border text-text-muted hover:text-text hover:border-border-bright transition-colors"
+						onclick={handleImport}
+					>import</button>
+					<span class="text-[10px] text-text-muted hidden sm:inline">Cmd+K search</span>
+				</div>
 			</div>
 
 			{#if workspace.activeTool === 'unit-converter'}

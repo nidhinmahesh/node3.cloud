@@ -34,7 +34,7 @@ export const categories = ['Visualize', 'Convert', 'Generate', 'Decode'] as cons
 
 class WorkspaceStore {
 	activeTool = $state<ToolId>('flow-mapper');
-	sidebarOpen = $state(true);
+	sidebarOpen = $state(false);
 	historyPanelOpen = $state(false);
 	cmdkOpen = $state(false);
 	history = $state<HistoryEntry[]>([]);

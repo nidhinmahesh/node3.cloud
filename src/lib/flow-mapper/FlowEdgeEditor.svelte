@@ -30,12 +30,14 @@
 		if (!src || !dst) return { x: 100, y: 100 };
 		const mx = ((src.x + dst.x) / 2) * zoom + panX;
 		const my = ((src.y + dst.y) / 2) * zoom + panY;
-		return { x: mx + 20, y: my - 40 };
+		const vw = typeof window !== 'undefined' ? window.innerWidth : 800;
+		const vh = typeof window !== 'undefined' ? window.innerHeight : 600;
+		return { x: Math.max(8, Math.min(mx + 20, vw - 240)), y: Math.max(48, Math.min(my - 40, vh - 160)) };
 	});
 </script>
 
 <div
-	class="fixed z-50 bg-bg-surface border border-border rounded shadow-lg p-3 w-56"
+	class="fixed z-50 bg-bg-surface border border-border rounded shadow-lg p-3 w-[calc(100vw-1rem)] max-w-56"
 	style="left:{screenPos.x}px;top:{screenPos.y}px;"
 >
 	<div class="flex items-center justify-between mb-2">

@@ -33,10 +33,10 @@
 </script>
 
 <div
-	class="absolute top-0 left-0 right-0 z-40 flex items-center gap-2 px-3 py-2 bg-bg-surface/80 backdrop-blur border-b border-border"
+	class="absolute top-0 left-0 right-0 z-40 flex flex-wrap items-center gap-1.5 md:gap-2 px-2 md:px-3 py-2 bg-bg-surface/80 backdrop-blur border-b border-border"
 >
 	<input
-		class="px-2 py-1 text-xs bg-bg border border-border rounded text-text w-40 focus:border-accent outline-none"
+		class="px-2 py-1 text-xs bg-bg border border-border rounded text-text w-28 md:w-40 focus:border-accent outline-none"
 		value={graphName}
 		oninput={(e) => onnamechange(e.currentTarget.value)}
 		placeholder="Graph name"
@@ -77,7 +77,7 @@
 		{/if}
 	</div>
 
-	<div class="w-px h-4 bg-border mx-1"></div>
+	<div class="hidden md:block w-px h-4 bg-border mx-1"></div>
 
 	<button
 		class="text-[10px] px-2 py-1 rounded border border-border text-text-muted hover:text-text hover:border-border-bright transition-colors"
@@ -91,7 +91,7 @@
 	{#if graphList.length > 0}
 		<button
 			class="ml-auto text-[10px] px-2 py-1 rounded border border-red-800 text-red-400 hover:bg-red-900/30 transition-colors"
-			onclick={ondelete}>delete graph</button
+			onclick={ondelete}>del</button
 		>
 	{/if}
 </div>

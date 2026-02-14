@@ -29,7 +29,8 @@
 	}
 </script>
 
-<aside class="w-72 h-full bg-bg-surface border-l border-border flex flex-col shrink-0">
+<aside class="w-72 h-full bg-bg-surface border-l border-border flex flex-col shrink-0
+	fixed z-50 top-0 right-0 md:static">
 	<div class="px-4 py-3 border-b border-border flex items-center justify-between">
 		<span class="text-xs font-semibold text-text-dim uppercase tracking-widest">History</span>
 		<button

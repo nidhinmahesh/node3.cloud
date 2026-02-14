@@ -25,12 +25,12 @@
 		onchange({ ...node, address, label });
 	}
 
-	let screenX = $derived(node.x * zoom + panX + 190);
-	let screenY = $derived(node.y * zoom + panY);
+	let screenX = $derived(Math.max(8, Math.min(node.x * zoom + panX + 190, (typeof window !== 'undefined' ? window.innerWidth : 800) - 250)));
+	let screenY = $derived(Math.max(48, Math.min(node.y * zoom + panY, (typeof window !== 'undefined' ? window.innerHeight : 600) - 200)));
 </script>
 
 <div
-	class="fixed z-50 bg-bg-surface border border-border rounded shadow-lg p-3 w-60"
+	class="fixed z-50 bg-bg-surface border border-border rounded shadow-lg p-3 w-[calc(100vw-1rem)] max-w-60"
 	style="left:{screenX}px;top:{screenY}px;"
 >
 	<div class="flex items-center justify-between mb-2">
