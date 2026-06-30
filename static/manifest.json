@@ -1,7 +1,7 @@
 {
-  "name": "node3.cloud — Web3 Developer Tools",
+  "name": "node3.cloud — Managed Rubix Node Platform",
   "short_name": "node3.cloud",
-  "description": "Free browser-based Web3 developer tools: unit converter, ABI encoder, Keccak256, hex converter, checksum validator, and more.",
+  "description": "Managed Rubix node platform. Webhooks, non-custodial signing, and hosted smart contracts.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0f",
