@@ -32,6 +32,13 @@ async function upload<T>(path: string, form: FormData): Promise<T> {
 	return res.json() as Promise<T>;
 }
 
+// Request limits per tier. null = no cap (Unlimited plan).
+export const TIER_REQUEST_LIMIT: Record<string, number | null> = {
+	free:      10_000,
+	pro:       500_000,
+	unlimited: null
+};
+
 export const api = {
 	auth: {
 		telegram: (data: TelegramUser) =>
@@ -72,7 +79,8 @@ export const api = {
 	},
 	billing: {
 		get: () => request<BillingInfo>('GET', '/api/billing'),
-		checkout: () => request<{ url: string }>('POST', '/api/billing/checkout'),
+		checkout: (plan: 'pro' | 'unlimited') =>
+			request<{ url: string }>('POST', '/api/billing/checkout', { plan }),
 		cancel: () => request<void>('POST', '/api/billing/cancel')
 	}
 };
@@ -94,7 +102,7 @@ export interface User {
 	telegram_id: number;
 	telegram_username: string;
 	did: string;
-	tier: 'free' | 'paid';
+	tier: 'free' | 'pro' | 'unlimited';
 	created_at: string;
 }
 
@@ -167,7 +175,7 @@ export interface Execution {
 }
 
 export interface BillingInfo {
-	tier: 'free' | 'paid';
+	tier: 'free' | 'pro' | 'unlimited';
 	subscription_id: string | null;
 	next_billing_date: string | null;
 	cancel_at: string | null;

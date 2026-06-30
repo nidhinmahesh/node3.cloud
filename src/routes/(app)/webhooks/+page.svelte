@@ -98,7 +98,7 @@
 	}
 
 	const FREE_LIMIT = 3;
-	const isPaid = $derived(auth.user?.tier === 'paid');
+	const isPaid = $derived(auth.user?.tier === 'pro' || auth.user?.tier === 'unlimited');
 	const atLimit = $derived(!isPaid && webhooks.filter(w => w.active).length >= FREE_LIMIT);
 </script>
 

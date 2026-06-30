@@ -25,10 +25,11 @@ Hosted at **node3.cloud**. Visual design: ChatGPT-style — clean sidebar, dark-
 
 ## 2. User Tiers
 
-| Tier | Node model | Requests/month | Payment |
-|------|-----------|----------------|---------|
-| Free | Shared node (DID on a node we manage) | 10,000 | None |
-| Paid | Dedicated node (own IPFS peer ID, own P2P identity) | [TBD] | Credit card |
+| Tier      | Node model                                           | Requests/month | Price     |
+|-----------|------------------------------------------------------|----------------|-----------|
+| Free      | Shared node (DID on a node we manage)                | 10,000         | $0        |
+| Pro       | Dedicated node (own IPFS peer ID, own P2P identity)  | 500,000        | $30/month |
+| Unlimited | Dedicated node (own IPFS peer ID, own P2P identity)  | No limit       | $100/month|
 
 **Key distinction — shared vs dedicated node:**
 - A Rubix node can host hundreds of DIDs. Free tier users get a DID created on one of the platform's shared nodes — no node is provisioned per user. The node is an infrastructure detail they never see.
@@ -339,7 +340,7 @@ Merging these is the right call on a single VM: they share the same Postgres con
 ```
 accounts
   id, telegram_id, telegram_username, created_at,
-  tier (free|paid), lemon_subscription_id
+  tier (free|pro|unlimited), lemon_subscription_id
 
 api_keys
   id, account_id, key_hash, label, node_id,
@@ -719,7 +720,7 @@ contract_executions
 ```
 accounts
   id, telegram_id, telegram_username, created_at,
-  tier (free|paid), lemon_subscription_id,
+  tier (free|pro|unlimited), lemon_subscription_id,
   did,          ← user's Rubix DID string
   node_id       ← FK to nodes table; determines write routing
 ```
@@ -796,7 +797,7 @@ accounts
 - ~~Node per user~~ → wrong model; one DID per user on a shared node (free) or dedicated node (paid); hundreds of DIDs per node is supported and correct
 
 **Still open:**
-1. **Paid tier limits** — How many req/month per paid tier? One paid tier or multiple (Growth / Pro / Enterprise)?
+1. ~~**Paid tier limits**~~ → Resolved: Free=10k, Pro=$30/500k, Unlimited=$100/no limit
 2. **Consensus call weighting** — Do write ops (transfer, deploy) cost more credits than reads?
 3. **Free tier network** — Mainnet, testnet, or user's choice?
 4. **Overage policy** — Hard block at 10k or charge per additional 1000 requests?

@@ -383,64 +383,57 @@
 			<p class="text-sm text-[--color-text-muted]">No credit card for the free tier. Cancel paid anytime.</p>
 		</div>
 
-		<div class="grid md:grid-cols-2 gap-8">
+		<div class="grid md:grid-cols-3 gap-6">
 
 			<!-- Free -->
-			<div class="border border-[--color-border] rounded-xl p-8 flex flex-col">
-				<div class="mb-8">
+			<div class="border border-[--color-border] rounded-xl p-7 flex flex-col">
+				<div class="mb-7">
 					<p class="text-xs text-[--color-text-muted] uppercase tracking-widest mb-2">Free</p>
 					<p class="text-4xl font-semibold text-[--color-text] mb-1">$0</p>
 					<p class="text-xs text-[--color-text-muted]">per month · always</p>
 				</div>
 
-				<div class="space-y-6 flex-1">
+				<div class="space-y-5 flex-1">
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Infrastructure</p>
-						<ul class="space-y-2 text-xs text-[--color-text-dim]">
-							<li>1 DID hosted on a shared node</li>
-							<li>Shared IPFS peer identity on Rubix mainnet</li>
-							<li>Access to the full Rubix protocol API</li>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Infrastructure</p>
+						<ul class="space-y-1.5 text-xs text-[--color-text-dim]">
+							<li>1 DID on a shared node</li>
+							<li>Shared IPFS peer identity</li>
+							<li>Full Rubix protocol API</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">API Access</p>
-						<ul class="space-y-2 text-xs text-[--color-text-dim]">
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">API Access</p>
+						<ul class="space-y-1.5 text-xs text-[--color-text-dim]">
 							<li>10,000 requests / month</li>
 							<li>1 API key</li>
-							<li>HTTP 429 with <code>Retry-After</code> at quota limit</li>
-							<li>Monthly reset on the 1st</li>
+							<li>429 + Retry-After at limit</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Webhooks</p>
-						<ul class="space-y-2 text-xs text-[--color-text-dim]">
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Webhooks</p>
+						<ul class="space-y-1.5 text-xs text-[--color-text-dim]">
 							<li>3 active subscriptions</li>
-							<li>All 4 event types (received, sent, deployed, executed)</li>
-							<li>3 delivery attempts per event, exponential backoff</li>
+							<li>All 4 event types</li>
 							<li>HMAC-signed payloads</li>
-							<li>90-day delivery history</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Smart Contracts</p>
-						<ul class="space-y-2 text-xs text-[--color-text-dim]">
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Smart Contracts</p>
+						<ul class="space-y-1.5 text-xs text-[--color-text-dim]">
 							<li>1 hosted WASM contract</li>
-							<li>Managed callback server included</li>
-							<li>Full execution log with input / output</li>
-							<li>State history per execution</li>
+							<li>Full execution log</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Non-Custodial Signing</p>
-						<ul class="space-y-2 text-xs text-[--color-text-dim]">
-							<li>In-browser BIP-39 key generation</li>
-							<li>In-browser transaction signing</li>
-							<li>AES-GCM encrypted key storage, local only</li>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Signing</p>
+						<ul class="space-y-1.5 text-xs text-[--color-text-dim]">
+							<li>Non-custodial · your key always</li>
 						</ul>
 					</div>
 				</div>
 
-				<div class="mt-8">
+				<div class="mt-7">
 					<a
 						href="#hero"
 						onclick={(e) => { e.preventDefault(); document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' }); }}
@@ -448,82 +441,126 @@
 					>
 						get started free →
 					</a>
-					<p class="text-[10px] text-[--color-text-muted] text-center mt-3">No credit card · no email · just Telegram</p>
+					<p class="text-[10px] text-[--color-text-muted] text-center mt-3">No credit card · just Telegram</p>
 				</div>
 			</div>
 
 			<!-- Pro -->
-			<div class="border border-[--color-accent] rounded-xl p-8 bg-[--color-bg-surface] flex flex-col relative">
-				<div class="absolute top-5 right-5">
-					<span class="text-[10px] px-2 py-0.5 bg-[--color-accent] text-white rounded-full">coming soon</span>
-				</div>
-
-				<div class="mb-8">
+			<div class="border border-[--color-accent] rounded-xl p-7 bg-[--color-bg-surface] flex flex-col">
+				<div class="mb-7">
 					<p class="text-xs text-[--color-accent] uppercase tracking-widest mb-2">Pro</p>
-					<p class="text-4xl font-semibold text-[--color-text] mb-1">TBD</p>
+					<p class="text-4xl font-semibold text-[--color-text] mb-1">$30</p>
 					<p class="text-xs text-[--color-text-muted]">per month · billed via Lemon Squeezy</p>
 				</div>
 
-				<div class="space-y-6 flex-1">
+				<div class="space-y-5 flex-1">
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Infrastructure</p>
-						<ul class="space-y-2 text-xs">
-							<li class="text-[--color-text]">Dedicated Rubix node — your own process on the VM</li>
-							<li class="text-[--color-text]">Unique IPFS peer ID on the Rubix network</li>
-							<li class="text-[--color-text]">Own P2P identity — peers connect to you directly</li>
-							<li class="text-[--color-text-dim]">Isolated CPU, memory, and storage</li>
-							<li class="text-[--color-text-dim]">Mainnet access</li>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Infrastructure</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">Dedicated Rubix node</li>
+							<li class="text-[--color-text]">Own IPFS peer ID</li>
+							<li class="text-[--color-text]">Own P2P identity on the network</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">API Access</p>
-						<ul class="space-y-2 text-xs">
-							<li class="text-[--color-text]">Higher monthly request limit (TBD)</li>
-							<li class="text-[--color-text]">Multiple API keys — one per app or environment</li>
-							<li class="text-[--color-text-dim]">Overage billing at $X / 1,000 additional requests</li>
-							<li class="text-[--color-text-dim]">Monthly reset on the 1st</li>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">API Access</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">500,000 requests / month</li>
+							<li class="text-[--color-text-dim]">Multiple API keys</li>
+							<li class="text-[--color-text-dim]">429 + Retry-After at limit</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Webhooks</p>
-						<ul class="space-y-2 text-xs">
-							<li class="text-[--color-text]">Unlimited active subscriptions</li>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Webhooks</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">Unlimited subscriptions</li>
 							<li class="text-[--color-text-dim]">All 4 event types</li>
-							<li class="text-[--color-text-dim]">3 delivery attempts with exponential backoff</li>
 							<li class="text-[--color-text-dim]">HMAC-signed payloads</li>
-							<li class="text-[--color-text]">1-year delivery history retention</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Smart Contracts</p>
-						<ul class="space-y-2 text-xs">
-							<li class="text-[--color-text]">Multiple hosted WASM contracts</li>
-							<li class="text-[--color-text]">Higher execution limits (TBD)</li>
-							<li class="text-[--color-text]">Execution history never pruned</li>
-							<li class="text-[--color-text-dim]">Full execution log with input / output / state diff</li>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Smart Contracts</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">Unlimited hosted contracts</li>
+							<li class="text-[--color-text-dim]">Full execution log</li>
 						</ul>
 					</div>
 					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Non-Custodial Signing</p>
-						<ul class="space-y-2 text-xs text-[--color-text-dim]">
-							<li>Same as Free — your key, always</li>
-						</ul>
-					</div>
-					<div>
-						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-3">Support</p>
-						<ul class="space-y-2 text-xs text-[--color-text-dim]">
-							<li>Priority Telegram support</li>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Signing</p>
+						<ul class="space-y-1.5 text-xs text-[--color-text-dim]">
+							<li>Non-custodial · your key always</li>
 						</ul>
 					</div>
 				</div>
 
-				<div class="mt-8">
-					<button
-						disabled
-						class="w-full text-xs py-3 px-4 border border-[--color-border] text-[--color-text-muted] rounded-lg cursor-not-allowed"
+				<div class="mt-7">
+					<a
+						href="#hero"
+						onclick={(e) => { e.preventDefault(); document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' }); }}
+						class="block text-center text-xs py-3 px-4 bg-[--color-accent] text-white rounded-lg hover:bg-[--color-accent-hover] transition-colors"
 					>
-						upgrade → (coming soon)
-					</button>
+						get started →
+					</a>
+					<p class="text-[10px] text-[--color-text-muted] text-center mt-3">Cancel anytime · powered by Lemon Squeezy</p>
+				</div>
+			</div>
+
+			<!-- Unlimited -->
+			<div class="border border-[--color-border] rounded-xl p-7 flex flex-col">
+				<div class="mb-7">
+					<p class="text-xs text-[--color-text-muted] uppercase tracking-widest mb-2">Unlimited</p>
+					<p class="text-4xl font-semibold text-[--color-text] mb-1">$100</p>
+					<p class="text-xs text-[--color-text-muted]">per month · billed via Lemon Squeezy</p>
+				</div>
+
+				<div class="space-y-5 flex-1">
+					<div>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Infrastructure</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">Dedicated Rubix node</li>
+							<li class="text-[--color-text]">Own IPFS peer ID</li>
+							<li class="text-[--color-text]">Own P2P identity on the network</li>
+						</ul>
+					</div>
+					<div>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">API Access</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">No request limit</li>
+							<li class="text-[--color-text-dim]">Multiple API keys</li>
+							<li class="text-[--color-text-dim]">Never rate-limited by quota</li>
+						</ul>
+					</div>
+					<div>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Webhooks</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">Unlimited subscriptions</li>
+							<li class="text-[--color-text-dim]">All 4 event types</li>
+							<li class="text-[--color-text-dim]">HMAC-signed payloads</li>
+						</ul>
+					</div>
+					<div>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Smart Contracts</p>
+						<ul class="space-y-1.5 text-xs">
+							<li class="text-[--color-text]">Unlimited hosted contracts</li>
+							<li class="text-[--color-text-dim]">Full execution log</li>
+						</ul>
+					</div>
+					<div>
+						<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-2">Signing</p>
+						<ul class="space-y-1.5 text-xs text-[--color-text-dim]">
+							<li>Non-custodial · your key always</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="mt-7">
+					<a
+						href="#hero"
+						onclick={(e) => { e.preventDefault(); document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' }); }}
+						class="block text-center text-xs py-3 px-4 border border-[--color-border] text-[--color-text-dim] rounded-lg hover:border-[--color-accent] hover:text-[--color-accent] transition-colors"
+					>
+						get started →
+					</a>
 					<p class="text-[10px] text-[--color-text-muted] text-center mt-3">Cancel anytime · powered by Lemon Squeezy</p>
 				</div>
 			</div>

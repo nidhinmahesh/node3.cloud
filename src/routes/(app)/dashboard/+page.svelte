@@ -64,7 +64,7 @@
 				</button>
 			</div>
 			<p class="text-[10px] text-[--color-text-muted] mt-2">
-				{auth.user.tier === 'paid' ? '● dedicated node' : '● shared node'}
+				{auth.user.tier === 'free' ? '● shared node' : '● dedicated node'}
 			</p>
 		{:else}
 			<p class="text-xs text-[--color-text-muted] mb-3">

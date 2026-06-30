@@ -167,7 +167,7 @@
 	}
 
 	const FREE_LIMIT = 1;
-	const isPaid = $derived(auth.user?.tier === 'paid');
+	const isPaid = $derived(auth.user?.tier === 'pro' || auth.user?.tier === 'unlimited');
 	const atLimit = $derived(!isPaid && contracts.length >= FREE_LIMIT);
 	const execModalTitle = $derived(
 		selectedContract ? `executions · ${selectedContract.contract_id.slice(0, 12)}…` : 'execution log'
