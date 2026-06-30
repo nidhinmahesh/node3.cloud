@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { auth } from '$lib/auth.svelte';
 	import { api, type Webhook, type Delivery } from '$lib/api';
 	import Modal from '$lib/components/Modal.svelte';
 
@@ -97,7 +98,8 @@
 	}
 
 	const FREE_LIMIT = 3;
-	const atLimit = $derived(webhooks.filter(w => w.active).length >= FREE_LIMIT);
+	const isPaid = $derived(auth.user?.tier === 'paid');
+	const atLimit = $derived(!isPaid && webhooks.filter(w => w.active).length >= FREE_LIMIT);
 </script>
 
 <div class="p-8 max-w-3xl">

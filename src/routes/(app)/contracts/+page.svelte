@@ -102,6 +102,14 @@
 		}
 	}
 
+	function cancelSign() {
+		showSign = false;
+		walletPin = '';
+		signError = '';
+		pendingSignId = '';
+		pendingHash = '';
+	}
+
 	async function handleSign() {
 		if (!auth.user) return;
 		signing = true;
@@ -111,14 +119,21 @@
 			if (!blob) throw new Error('No wallet found in this browser. Re-run wallet setup.');
 			const mnemonic = await decryptMnemonic(blob, walletPin);
 			const { privateKey } = deriveKey(mnemonic);
-			const signature = signHash(privateKey, pendingHash);
-			privateKey.fill(0);
+			let signature: string;
+			try {
+				signature = signHash(privateKey, pendingHash);
+			} finally {
+				privateKey.fill(0);
+			}
 			await api.tx.sign(pendingSignId, signature);
 			showSign = false;
 			walletPin = '';
+			pendingSignId = '';
+			pendingHash = '';
 			await load();
 		} catch (e: unknown) {
 			signError = e instanceof Error ? e.message : 'Signing failed.';
+			walletPin = '';
 		} finally {
 			signing = false;
 		}
@@ -176,6 +191,28 @@
 		<p class="text-xs text-[--color-yellow] mb-4">
 			Free tier: 1 hosted contract. Upgrade to Pro for multiple contracts.
 		</p>
+	{/if}
+
+	{#if pendingSignId && !showSign}
+		<div class="border border-[--color-yellow] rounded-lg p-4 mb-4 flex items-center justify-between gap-4">
+			<p class="text-xs text-[--color-yellow]">
+				A contract deployment is awaiting your wallet signature.
+			</p>
+			<div class="flex gap-3 shrink-0">
+				<button
+					onclick={() => { showSign = true; }}
+					class="text-xs text-[--color-accent] hover:underline"
+				>
+					sign now
+				</button>
+				<button
+					onclick={cancelSign}
+					class="text-xs text-[--color-text-muted] hover:text-[--color-red]"
+				>
+					discard
+				</button>
+			</div>
+		</div>
 	{/if}
 
 	{#if !auth.user?.did}

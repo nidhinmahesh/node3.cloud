@@ -4,7 +4,6 @@
 	import { api } from '$lib/api';
 	import {
 		generateMnemonic,
-		validateMnemonicWords,
 		deriveKey,
 		publicKeyToHex,
 		encryptMnemonic,
@@ -72,11 +71,13 @@
 
 	async function createDID() {
 		createError = '';
+		const { privateKey, publicKey } = deriveKey(mnemonic);
 		try {
-			const { privateKey, publicKey } = deriveKey(mnemonic);
 			const pubHex = publicKeyToHex(publicKey);
 
-			// Store encrypted mnemonic in IndexedDB if user set a PIN.
+			// Only store the encrypted mnemonic if the user chose to set a PIN.
+			// Users who manage keys externally skip this — they can still use all
+			// API features; only browser-based contract signing requires stored keys.
 			if (auth.user && !skipPin) {
 				const blob = await encryptMnemonic(mnemonic, pin);
 				await storeMnemonic(auth.user.id, blob);
@@ -90,14 +91,13 @@
 				auth.user = { ...auth.user, did: result.did };
 			}
 
-			// Prevent private key from lingering in closure scope.
-			privateKey.fill(0);
-
 			step = 'done';
 			setTimeout(() => goto('/dashboard'), 1500);
 		} catch (e: unknown) {
 			createError = e instanceof Error ? e.message : 'Failed to create DID.';
 			step = 'protect'; // allow retry
+		} finally {
+			privateKey.fill(0);
 		}
 	}
 
@@ -175,7 +175,7 @@
 		<h1 class="text-sm font-medium text-[--color-text] mb-2">Protect your wallet</h1>
 		<p class="text-xs text-[--color-text-muted] mb-6 leading-relaxed">
 			Set a PIN to encrypt your recovery phrase locally in this browser.
-			You'll need it to sign transactions.
+			You'll need it to sign transactions from this browser.
 		</p>
 		{#if !skipPin}
 			<div class="space-y-3 mb-4">
@@ -208,7 +208,7 @@
 		{/if}
 		<label class="flex items-center gap-2 text-xs text-[--color-text-muted] mb-6 cursor-pointer">
 			<input type="checkbox" bind:checked={skipPin} class="w-3 h-3" />
-			Skip (I'll manage my own key security)
+			Skip — I'll sign transactions with my own wallet
 		</label>
 		{#if createError}
 			<p class="text-xs text-[--color-red] mb-3">{createError}</p>

@@ -29,8 +29,16 @@ class AuthStore {
 
 	async loginWithTelegram(data: TelegramUser) {
 		const res = await api.auth.telegram(data);
+		// Store token only after me() succeeds; a transient me() failure would
+		// otherwise leave a valid JWT with no user state, stranding the session.
 		localStorage.setItem('n3_token', res.token);
-		this.user = await api.auth.me();
+		try {
+			this.user = await api.auth.me();
+		} catch (e) {
+			localStorage.removeItem('n3_token');
+			this.initialized = false;
+			throw e;
+		}
 		return this.user;
 	}
 

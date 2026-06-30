@@ -60,9 +60,10 @@ export const api = {
 		executions: (id: string) => request<Execution[]>('GET', `/api/contracts/${id}/executions`)
 	},
 	dids: {
-		create: (publicKey?: string) =>
-			request<{ did: string }>('POST', '/api/dids/create',
-				publicKey ? { public_key: publicKey } : {})
+		create: (publicKey: string) => {
+			if (!publicKey) throw new Error('publicKey is required for non-custodial DID creation');
+			return request<{ did: string }>('POST', '/api/dids/create', { public_key: publicKey });
+		}
 	},
 	tx: {
 		initiate: (body: unknown) => request<unknown>('POST', '/api/tx/initiate', body),
