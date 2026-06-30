@@ -148,7 +148,7 @@
 			</div>
 
 			<!-- Graphic: event pipeline -->
-			<div class="border border-[--color-border] rounded-xl p-6 bg-[--color-bg-surface]">
+			<div class="border border-[--color-border] rounded-xl p-6 bg-[--color-bg-surface] font-mono">
 				<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-5">Event delivery pipeline</p>
 
 				<!-- Source -->
@@ -202,7 +202,7 @@
 		<div class="grid md:grid-cols-2 gap-16 items-center">
 
 			<!-- Graphic: key lifecycle -->
-			<div class="border border-[--color-border] rounded-xl p-6 bg-[--color-bg-surface]">
+			<div class="border border-[--color-border] rounded-xl p-6 bg-[--color-bg-surface] font-mono">
 				<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-6">How your key stays yours</p>
 				<div class="space-y-1">
 
@@ -319,7 +319,7 @@
 			</div>
 
 			<!-- Graphic: deployment pipeline -->
-			<div class="border border-[--color-border] rounded-xl p-6 bg-[--color-bg-surface]">
+			<div class="border border-[--color-border] rounded-xl p-6 bg-[--color-bg-surface] font-mono">
 				<p class="text-[10px] text-[--color-text-muted] uppercase tracking-widest mb-6">Deployment lifecycle</p>
 				<div>
 					<div class="flex items-start gap-4">
