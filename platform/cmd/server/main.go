@@ -62,7 +62,11 @@ func main() {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(corsMiddleware(cfg.platformURL))
+	var extraOrigins []string
+	if cfg.devCORSOrigin != "" {
+		extraOrigins = append(extraOrigins, cfg.devCORSOrigin)
+	}
+	r.Use(corsMiddleware(cfg.platformURL, extraOrigins))
 
 	// ── Public auth endpoints ────────────────────────────────────────────────
 	r.Post("/api/auth/telegram", authH.HandleTelegramAuth)
@@ -167,6 +171,7 @@ type config struct {
 	lemonAPIKey      string
 	lemonVariantID   string
 	platformURL      string
+	devCORSOrigin    string // optional: extra CORS origin for local dev (e.g. http://localhost:5173)
 	wasmDir          string
 	serverSecret     string // HMAC key for DID password derivation — never rotated
 	callbackSecret   string // HMAC key for per-contract callback URL tokens
@@ -183,6 +188,7 @@ func loadConfig() config {
 		lemonAPIKey:      requireEnv("LEMON_API_KEY"),
 		lemonVariantID:   requireEnv("LEMON_VARIANT_ID"),
 		platformURL:      getEnv("PLATFORM_URL", "https://node3.cloud"),
+		devCORSOrigin:    getEnv("DEV_CORS_ORIGIN", ""),
 		wasmDir:          getEnv("WASM_DIR", "/opt/node3/wasm"),
 		serverSecret:     requireEnv("SERVER_SECRET"),
 		callbackSecret:   requireEnv("CALLBACK_SECRET"),
@@ -207,11 +213,15 @@ func getEnv(key, fallback string) string {
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 
-func corsMiddleware(allowedOrigin string) func(http.Handler) http.Handler {
+func corsMiddleware(allowedOrigin string, extraOrigins []string) func(http.Handler) http.Handler {
+	allowed := map[string]bool{allowedOrigin: true}
+	for _, o := range extraOrigins {
+		allowed[o] = true
+	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := r.Header.Get("Origin")
-			if origin == allowedOrigin || origin == "http://localhost:5173" {
+			if allowed[origin] {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
 				w.Header().Set("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS")

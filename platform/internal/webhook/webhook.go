@@ -298,6 +298,7 @@ func buildEvent(eventType string, tx db.FullnodeTx) map[string]interface{} {
 }
 
 // deliver POSTs the event payload to the subscriber's callback URL.
+// Retries up to 3 times with exponential backoff (1s, 2s, 4s) on failure.
 // Uses its own timeout context so a server shutdown does not cancel
 // in-flight deliveries mid-write (which would produce connection resets
 // on the subscriber's end with no way to distinguish from a network error).
@@ -309,31 +310,44 @@ func (w *Worker) deliver(sub db.WebhookSubscription, txID string, payload map[st
 
 	sig := sign(body, sub.Secret)
 
-	ctx, cancel := context.WithTimeout(context.Background(), w.client.Timeout)
-	defer cancel()
+	const maxAttempts = 3
+	backoff := time.Second
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, sub.CallbackURL, bytes.NewReader(body))
-	if err != nil {
-		w.recordDelivery(sub.ID, txID, "failed", nil)
-		return
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Rubix-Signature", "sha256="+sig)
-	req.Header.Set("X-Rubix-Event", sub.EventType)
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		ctx, cancel := context.WithTimeout(context.Background(), w.client.Timeout)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, sub.CallbackURL, bytes.NewReader(body))
+		if err != nil {
+			cancel()
+			w.recordDelivery(sub.ID, txID, "failed", nil)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Rubix-Signature", "sha256="+sig)
+		req.Header.Set("X-Rubix-Event", sub.EventType)
 
-	resp, err := w.client.Do(req)
-	if err != nil {
-		w.recordDelivery(sub.ID, txID, "failed", nil)
-		return
-	}
-	defer resp.Body.Close()
+		resp, err := w.client.Do(req)
+		cancel()
 
-	status := "success"
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		status = "failed"
+		if err == nil {
+			code := resp.StatusCode
+			resp.Body.Close()
+			if code >= 200 && code < 300 {
+				w.recordDelivery(sub.ID, txID, "success", &code)
+				return
+			}
+			// Non-2xx: record and retry if attempts remain.
+			if attempt == maxAttempts {
+				w.recordDelivery(sub.ID, txID, "failed", &code)
+				return
+			}
+		} else if attempt == maxAttempts {
+			w.recordDelivery(sub.ID, txID, "failed", nil)
+			return
+		}
+
+		time.Sleep(backoff)
+		backoff *= 2
 	}
-	code := resp.StatusCode
-	w.recordDelivery(sub.ID, txID, status, &code)
 }
 
 func (w *Worker) recordDelivery(subID int64, txID, status string, code *int) {

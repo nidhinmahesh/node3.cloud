@@ -23,6 +23,7 @@ import (
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+	"github.com/tetratelabs/wazero/sys"
 	"node3.cloud/platform/internal/auth"
 	"node3.cloud/platform/internal/db"
 	"node3.cloud/platform/internal/nodeutil"
@@ -360,11 +361,17 @@ func runWASM(ctx context.Context, wasmBytes []byte, input, state json.RawMessage
 
 	_, runErr := rt.InstantiateModule(ctx, mod, cfg)
 	if runErr != nil {
-		errDetail := strings.TrimSpace(stderrBuf.String())
-		if errDetail == "" {
-			errDetail = runErr.Error()
+		// WASI programs call proc_exit(0) on clean exit; wazero returns a non-nil
+		// *sys.ExitError even for exit code 0. Treat code 0 as success and fall
+		// through to parse stdout. Any non-zero exit code is a contract failure.
+		var exitErr *sys.ExitError
+		if !errors.As(runErr, &exitErr) || exitErr.ExitCode() != 0 {
+			errDetail := strings.TrimSpace(stderrBuf.String())
+			if errDetail == "" {
+				errDetail = runErr.Error()
+			}
+			return nil, nil, fmt.Errorf("run: %s", errDetail)
 		}
-		return nil, nil, fmt.Errorf("run: %s", errDetail)
 	}
 
 	var result struct {

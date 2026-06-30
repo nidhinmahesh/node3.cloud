@@ -186,6 +186,7 @@
 					<input
 						type="password"
 						bind:value={pin}
+						autocomplete="new-password"
 						class="w-full text-xs border border-[--color-border] rounded px-2 py-1.5 bg-[--color-bg-surface] text-[--color-text] focus:outline-none focus:border-[--color-accent]"
 					/>
 				</div>
@@ -196,6 +197,7 @@
 					<input
 						type="password"
 						bind:value={pinConfirm}
+						autocomplete="new-password"
 						class="w-full text-xs border border-[--color-border] rounded px-2 py-1.5 bg-[--color-bg-surface] text-[--color-text] focus:outline-none focus:border-[--color-accent]"
 					/>
 				</div>

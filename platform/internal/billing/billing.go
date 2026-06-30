@@ -151,7 +151,11 @@ func (h *Handler) HandleLemonWebhook(w http.ResponseWriter, r *http.Request) {
 				nextBilling = &t
 			}
 		}
-		h.db.SetAccountTier(r.Context(), accountID, "paid", subID, nextBilling, nil)
+		if err := h.db.SetAccountTier(r.Context(), accountID, "paid", subID, nextBilling, nil); err != nil {
+			log.Printf("billing: SetAccountTier failed for account %d event %s: %v", accountID, event.Meta.EventName, err)
+			writeErr(w, http.StatusInternalServerError, "failed to update account tier")
+			return
+		}
 
 		// Provision dedicated node on first upgrade (subscription_created only).
 		// subscription_updated fires on renewals — skip re-provisioning then.
@@ -161,7 +165,13 @@ func (h *Handler) HandleLemonWebhook(w http.ResponseWriter, r *http.Request) {
 				log.Printf("billing: no dedicated node available for account %d (err=%v) — staying on shared node", accountID, err)
 			} else {
 				account, err := h.db.GetAccountByID(r.Context(), accountID)
-				if err == nil {
+				if err != nil {
+					// Node claimed but account fetch failed — release the node to avoid orphaning it.
+					log.Printf("billing: GetAccountByID failed after node claim for account %d: %v", accountID, err)
+					if freeErr := h.db.FreeNode(r.Context(), accountID); freeErr != nil {
+						log.Printf("billing: failed to release orphaned node for account %d: %v", accountID, freeErr)
+					}
+				} else {
 					did, err := h.gw.CreateDIDOnNode(r.Context(), account)
 					if err != nil {
 						log.Printf("billing: DID creation on node %d failed for account %d: %v", nodeID, accountID, err)
@@ -181,11 +191,19 @@ func (h *Handler) HandleLemonWebhook(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		// Keep "paid" until the billing period ends; subscription_expired fires then.
-		h.db.SetAccountTier(r.Context(), accountID, "paid", subID, nil, cancelAt)
+		if err := h.db.SetAccountTier(r.Context(), accountID, "paid", subID, nil, cancelAt); err != nil {
+			log.Printf("billing: SetAccountTier failed for account %d event %s: %v", accountID, event.Meta.EventName, err)
+			writeErr(w, http.StatusInternalServerError, "failed to update account tier")
+			return
+		}
 
 	case "subscription_expired":
 		// Billing period has ended after cancellation — downgrade and release node.
-		h.db.SetAccountTier(r.Context(), accountID, "free", "", nil, nil) //nolint:errcheck
+		if err := h.db.SetAccountTier(r.Context(), accountID, "free", "", nil, nil); err != nil {
+			log.Printf("billing: SetAccountTier failed for account %d event %s: %v", accountID, event.Meta.EventName, err)
+			writeErr(w, http.StatusInternalServerError, "failed to downgrade account")
+			return
+		}
 		if err := h.db.FreeNode(r.Context(), accountID); err != nil {
 			log.Printf("billing: failed to free node for account %d: %v", accountID, err)
 		}

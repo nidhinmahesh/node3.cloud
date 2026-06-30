@@ -361,7 +361,7 @@ func (d *DB) GetAPIKeyByHash(ctx context.Context, hash string) (*APIKey, error) 
 	k := &APIKey{}
 	err := d.pool.QueryRow(ctx, `
 		SELECT id, account_id, key_hash, COALESCE(label,''), created_at, revoked_at, last_used_at
-		FROM platform.api_keys WHERE key_hash = $1
+		FROM platform.api_keys WHERE key_hash = $1 AND revoked_at IS NULL
 	`, hash).Scan(&k.ID, &k.AccountID, &k.KeyHash, &k.Label,
 		&k.CreatedAt, &k.RevokedAt, &k.LastUsedAt)
 	if err != nil {
@@ -524,6 +524,16 @@ func (d *DB) GetWebhookCursor(ctx context.Context) (time.Time, error) {
 	var last time.Time
 	err := d.pool.QueryRow(ctx,
 		`SELECT last_seen FROM platform.webhook_cursor WHERE id = 1`).Scan(&last)
+	if err == pgx.ErrNoRows {
+		// First start: no cursor row yet. Initialize to now and return zero time
+		// so the worker starts from "no prior transactions seen".
+		if _, initErr := d.pool.Exec(ctx,
+			`INSERT INTO platform.webhook_cursor (id, last_seen) VALUES (1, NOW()) ON CONFLICT (id) DO NOTHING`,
+		); initErr != nil {
+			return time.Time{}, initErr
+		}
+		return time.Time{}, nil
+	}
 	return last, err
 }
 
@@ -531,13 +541,14 @@ func (d *DB) GetWebhookCursor(ctx context.Context) (time.Time, error) {
 // which is the earliest point from which the fullnode's coverage is continuous.
 // Returns zero Time if the table is empty or unreachable.
 func (d *DB) GetDataSince(ctx context.Context) (time.Time, error) {
-	var t time.Time
+	// MIN() on an empty table returns SQL NULL; scan into *time.Time to handle it.
+	var t *time.Time
 	err := d.rubixPool.QueryRow(ctx,
 		`SELECT MIN(created_at) FROM fullnode_transactions`).Scan(&t)
-	if err != nil {
+	if err != nil || t == nil {
 		return time.Time{}, err
 	}
-	return t, nil
+	return *t, nil
 }
 
 // FreeNode releases a dedicated node back to the pool when a paid subscription
@@ -552,7 +563,7 @@ func (d *DB) FreeNode(ctx context.Context, accountID int64) error {
 
 	var nodeID int
 	if err := tx.QueryRow(ctx,
-		`SELECT node_id FROM platform.accounts WHERE id = $1`, accountID).Scan(&nodeID); err != nil {
+		`SELECT node_id FROM platform.accounts WHERE id = $1 FOR UPDATE`, accountID).Scan(&nodeID); err != nil {
 		return err
 	}
 	if nodeID == 0 {
@@ -635,7 +646,7 @@ func (d *DB) CreateHostedContract(ctx context.Context, c *HostedContract) (int64
 		INSERT INTO platform.hosted_contracts
 		  (account_id, contract_id, wasm_artifact_hash, initial_state, current_state)
 		VALUES ($1,$2,$3,$4,$5) RETURNING id
-	`, c.AccountID, c.ContractID, c.WASMArtifactHash, c.InitialState, c.InitialState).Scan(&id)
+	`, c.AccountID, c.ContractID, c.WASMArtifactHash, c.InitialState, c.CurrentState).Scan(&id)
 	return id, err
 }
 
@@ -699,7 +710,7 @@ func (d *DB) ListHostedContracts(ctx context.Context, accountID int64) ([]Hosted
 func (d *DB) UpdateContractState(ctx context.Context, contractID string, newState json.RawMessage) error {
 	_, err := d.pool.Exec(ctx, `
 		UPDATE platform.hosted_contracts
-		SET current_state = $1, execution_count = execution_count + 1, deployed_at = COALESCE(deployed_at, NOW())
+		SET current_state = $1, execution_count = execution_count + 1
 		WHERE contract_id = $2
 	`, newState, contractID)
 	return err

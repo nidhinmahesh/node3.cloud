@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { auth } from '$lib/auth.svelte';
 	import { api, type Usage, type Key, type Webhook } from '$lib/api';
 
@@ -7,7 +8,6 @@
 	let keys = $state<Key[]>([]);
 	let webhooks = $state<Webhook[]>([]);
 	let error = $state('');
-	let creatingDID = $state(false);
 	let didError = $state('');
 
 	onMount(async () => {
@@ -35,17 +35,8 @@
 		if (auth.user?.did) navigator.clipboard.writeText(auth.user.did);
 	}
 
-	async function handleCreateDID() {
-		creatingDID = true;
-		didError = '';
-		try {
-			const res = await api.dids.create();
-			if (auth.user) auth.user.did = res.did;
-		} catch (e: any) {
-			didError = e.message || 'Failed to create DID';
-		} finally {
-			creatingDID = false;
-		}
+	function handleCreateDID() {
+		goto('/setup');
 	}
 
 	const activeWebhooks = $derived(webhooks.filter(w => w.active).length);
@@ -77,17 +68,13 @@
 			</p>
 		{:else}
 			<p class="text-xs text-[--color-text-muted] mb-3">
-				You don't have a DID yet. Create one to start using the Rubix network.
+				You don't have a DID yet. Set up your wallet to create one.
 			</p>
-			{#if didError}
-				<p class="text-xs text-[--color-red] mb-3">{didError}</p>
-			{/if}
 			<button
 				onclick={handleCreateDID}
-				disabled={creatingDID}
-				class="text-xs border border-[--color-accent] text-[--color-accent] hover:bg-[--color-accent] hover:text-[--color-bg] px-3 py-1.5 rounded transition-colors disabled:opacity-50"
+				class="text-xs border border-[--color-accent] text-[--color-accent] hover:bg-[--color-accent] hover:text-[--color-bg] px-3 py-1.5 rounded transition-colors"
 			>
-				{creatingDID ? 'creating…' : 'create DID'}
+				set up wallet →
 			</button>
 		{/if}
 	</div>

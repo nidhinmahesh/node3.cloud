@@ -152,9 +152,11 @@ func (h *Handler) HandleTelegramAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Auth date must be within the last hour to prevent replay attacks.
-	if time.Since(time.Unix(u.AuthDate, 0)) > time.Hour {
-		writeErr(w, http.StatusUnauthorized, "auth_date too old")
+	// Auth date must be within the last hour and must not be in the future.
+	authTime := time.Unix(u.AuthDate, 0)
+	now := time.Now()
+	if now.Before(authTime) || now.Sub(authTime) > time.Hour {
+		writeErr(w, http.StatusUnauthorized, "auth_date invalid")
 		return
 	}
 

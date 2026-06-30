@@ -362,7 +362,12 @@ func (h *Handler) CreateDIDOnNode(ctx context.Context, account *db.Account) (str
 // allocation cost is negligible. Cache proxies by node_id if node count grows.
 func (h *Handler) HandleNodeProxy(w http.ResponseWriter, r *http.Request) {
 	account := auth.AccountFromCtx(r.Context())
-	target, _ := url.Parse(nodeutil.URL(account.NodeID))
+	rawURL := nodeutil.URL(account.NodeID)
+	target, err := url.Parse(rawURL)
+	if err != nil || target.Host == "" {
+		writeErr(w, http.StatusInternalServerError, "invalid node configuration")
+		return
+	}
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		writeErr(w, http.StatusBadGateway, "node unreachable")

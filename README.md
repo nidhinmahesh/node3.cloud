@@ -1,93 +1,65 @@
 # node3.cloud
 
-Your personal web3 dev workbench — tools, history, and AI help, all saved in your browser. You don't need cloud for everything, just like the name.
+Managed Rubix node platform — API access, webhooks, non-custodial signing, and hosted smart contracts. Free to start.
 
-**[node3.cloud](https://node3.cloud)** is a fully offline-capable, browser-native toolkit for Ethereum and EVM developers. No accounts, no servers, no tracking. Everything runs client-side and persists in IndexedDB.
+**[node3.cloud](https://node3.cloud)**
 
-## Why
+---
 
-Every web3 dev has a dozen browser tabs open — one for converting wei, another for hashing, another for decoding calldata. node3.cloud puts them all in one place that loads instantly, works offline, and never phones home.
+## What it is
 
-## Tools
+Running a Rubix node means managing IPFS, P2P networking, port forwarding, and a database before writing a single line of your app. node3.cloud does all of that so you don't have to.
 
-### Visualize
-- **Tx Flow Mapper** — Interactive canvas for mapping transaction flows between addresses. Add nodes, connect them with edges, label with amounts/hashes, pan & zoom. Persists across sessions.
+You get:
+- A managed Rubix node with a REST API authenticated by API key
+- Webhooks that fire HTTP callbacks when transactions settle on-chain
+- Non-custodial signing — your private key stays in your browser, derived from your BIP-39 mnemonic
+- Hosted smart contracts — upload WASM, get execution logs and state history per run
 
-### Convert
-- **Unit Converter** — Wei / Gwei / ETH conversion with full precision
-- **Hex Converter** — Hex / Decimal / Binary interconversion
-- **Base64 Codec** — Base64 / UTF-8 / Hex encoding and decoding
-- **Epoch Converter** — Unix timestamp to human-readable date and back
-- **Checksum Address** — EIP-55 mixed-case checksum validation and formatting
+## Architecture
 
-### Generate
-- **Keccak256** — Hash any input string
-- **Function Selector** — Compute 4-byte selectors from function signatures
+```
+nginx (TLS, static portal)
+  └── platform (Go, :8080)
+        ├── postgres (platformdb — accounts, sessions, keys, webhooks, contracts)
+        └── node0 (rubixgoplatform, :20000)
+              └── postgres (rubixdb — fullnode_transactions, tokens, DIDs)
+```
 
-### Decode
-- **ABI Encoder** — Encode and decode ABI-encoded calldata
+Four Docker Compose services on a private bridge. Only nginx is internet-facing (ports 80/443). Rubix P2P ports (21000, 22000, 4002) are exposed directly for network participation.
 
-## Contributing a Tool
+## Stack
 
-This is where you come in. If you've ever built a one-off script or helper for your web3 workflow, it probably belongs here.
-
-**Tools we'd love to see contributed:**
-
-- **RLP Encoder/Decoder** — Encode and decode RLP-serialized data
-- **Merkle Tree Builder** — Construct and verify Merkle proofs
-- **Storage Slot Calculator** — Compute Solidity storage slot positions for mappings and arrays
-- **Event Log Decoder** — Paste raw log data, decode with ABI
-- **Signature Recovery** — Recover signer address from a signed message
-- **CREATE2 Address Calculator** — Predict contract deployment addresses
-- **Gas Estimator** — Estimate gas costs for common operations at current prices
-- **Bytecode Disassembler** — Disassemble EVM bytecode into opcodes
-- **ENS Namehash** — Compute namehash for ENS domains
-- **Chain ID Lookup** — Search chain IDs, RPCs, explorers across EVM networks
-- **HD Wallet Derivation Path Explorer** — Visualize BIP-44 derivation paths
-- **Transaction Builder** — Construct raw unsigned transactions
-- **Calldata Decoder** — Decode raw calldata against known function signatures
-
-Or bring your own idea. If it helps your daily workflow, it'll help others.
-
-### How to Add a Tool
-
-This project was built with AI (Claude) and we actively encourage you to do the same. Point your AI coding tool at this repo, describe the tool you want, and ship it. The codebase is structured to make that easy.
-
-1. Fork the repo
-2. Create your component in `src/lib/tools/YourTool.svelte` — follow any existing tool as a template
-3. Register it in `src/lib/stores.svelte.ts` — add the ID to `ToolId`, add a `ToolDef` entry
-4. Add the conditional render in `src/routes/+page.svelte`
-5. Open a PR
-
-**Constraints:**
-- Must work entirely in the browser. No external API calls for core functionality.
-- Use the existing design tokens (`text-text`, `bg-bg-surface`, `border-border`, `text-accent`, etc.)
-- Keep dependencies minimal. Prefer `@noble/*` and `ethers` which are already in the project.
-- History integration via `addHistoryEntry()` from `$lib/db` is encouraged but optional.
-- AI-generated PRs are welcome. Just make sure it builds and the tool works.
-
-## Tech Stack
-
-- [SvelteKit](https://svelte.dev) with Svelte 5 runes
-- [Tailwind CSS v4](https://tailwindcss.com)
-- [Dexie](https://dexie.org) (IndexedDB wrapper)
-- [ethers.js](https://docs.ethers.org)
-- [@noble/hashes](https://github.com/paulmillr/noble-hashes)
-- Static build via `@sveltejs/adapter-static`, deployed to GitHub Pages
+- **Platform**: Go, chi router, pgx v5, wazero (WASM runtime, CGO-free)
+- **Portal**: SvelteKit (Svelte 5 runes), Tailwind CSS v4, static SPA via `adapter-static`
+- **Crypto**: BIP-39/BIP-44 at `m/44'/9999'/0'/0/0` in-browser, `@noble/secp256k1`, PBKDF2 + AES-GCM for encrypted IndexedDB storage
+- **Payments**: Lemon Squeezy subscriptions, webhook-driven tier management
 
 ## Development
 
 ```sh
+# Frontend (portal)
 npm install
 npm run dev
+
+# Platform (requires Go 1.22+ and Postgres)
+cd platform
+go run ./cmd/server
 ```
 
-Build for production:
+For local dev, set `DEV_CORS_ORIGIN=http://localhost:5173` in your environment so the platform accepts requests from the Vite dev server.
 
-```sh
-npm run build
-npm run preview
-```
+See [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment on a fresh VM.
+
+## Plans
+
+| | Free | Pro |
+|---|---|---|
+| Node | Shared | Dedicated |
+| Requests | 10,000 / month | Higher limits |
+| API keys | 1 | Multiple |
+| Webhooks | 3 subscriptions | Unlimited |
+| Hosted contracts | 1 | Multiple |
 
 ## License
 
