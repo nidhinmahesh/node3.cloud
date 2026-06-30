@@ -16,43 +16,50 @@
 		{
 			group: 'Infrastructure',
 			rows: [
-				{ label: 'Node',                   sub: 'The Rubix process serving your DID',           free: 'Shared node',    pro: 'Dedicated node', unlimited: 'Dedicated node' },
-				{ label: 'IPFS peer identity',     sub: 'Your peer ID on the Rubix P2P network',        free: 'Shared',         pro: 'Own peer ID',    unlimited: 'Own peer ID'    },
-				{ label: 'Own P2P identity',       sub: 'Peers connect to you directly',                free: false,            pro: true,             unlimited: true             },
+				{ label: 'Dedicated Rubix node',        sub: 'Your own isolated node process — not shared with anyone',       free: false, pro: true,  unlimited: true  },
+				{ label: 'Own IPFS peer identity',      sub: 'Unique peer ID on the Rubix network, not pooled',               free: false, pro: true,  unlimited: true  },
+				{ label: 'Own P2P network identity',    sub: 'Other peers connect directly to your node',                     free: false, pro: true,  unlimited: true  },
 			]
 		},
 		{
 			group: 'API',
 			rows: [
-				{ label: 'Monthly requests',       sub: 'Resets on the 1st of each month',             free: '10,000',         pro: '500,000',        unlimited: 'Unlimited'      },
-				{ label: 'API keys',               sub: 'Authenticate separate apps or environments',   free: '1 key',          pro: 'Multiple',       unlimited: 'Multiple'       },
-				{ label: 'At quota limit',         sub: 'What happens when the cap is reached',         free: 'HTTP 429',       pro: 'HTTP 429',       unlimited: 'Never limited'  },
+				{ label: 'Monthly request quota',       sub: 'Resets on the 1st — counts every API call',                    free: '10,000',   pro: '500,000', unlimited: 'Unlimited' },
+				{ label: 'Multiple API keys',           sub: 'Separate keys per app, environment, or team member',            free: false, pro: true,  unlimited: true  },
+				{ label: 'Never rate-limited',          sub: 'No HTTP 429s, no Retry-After — ever',                          free: false, pro: false, unlimited: true  },
 			]
 		},
 		{
 			group: 'Webhooks',
 			rows: [
-				{ label: 'Active subscriptions',   sub: 'Concurrent event listeners',                   free: '3',              pro: 'Unlimited',      unlimited: 'Unlimited'      },
-				{ label: 'All 4 event types',      sub: 'token.received/sent, contract.deployed/executed', free: true,          pro: true,             unlimited: true             },
-				{ label: 'HMAC-signed payloads',   sub: 'X-Rubix-Signature header on every delivery',   free: true,            pro: true,             unlimited: true             },
-				{ label: 'Retry on failure',       sub: '3 attempts with exponential backoff',           free: true,            pro: true,             unlimited: true             },
+				{ label: 'Unlimited subscriptions',     sub: 'No cap on concurrent active event listeners',                   free: false, pro: true,  unlimited: true  },
+				{ label: 'All 4 event types',           sub: 'token.received/sent · contract.deployed/executed',              free: true,  pro: true,  unlimited: true  },
+				{ label: 'HMAC-signed payloads',        sub: 'X-Rubix-Signature on every delivery for verification',          free: true,  pro: true,  unlimited: true  },
+				{ label: 'Retry on failure',            sub: '3 attempts with exponential backoff on any non-2xx response',   free: true,  pro: true,  unlimited: true  },
 			]
 		},
 		{
 			group: 'Smart Contracts',
 			rows: [
-				{ label: 'Hosted WASM contracts',  sub: 'Contracts we manage end-to-end for you',       free: '1 contract',     pro: 'Unlimited',      unlimited: 'Unlimited'      },
-				{ label: 'Managed callback server',sub: 'Registered on your node automatically',         free: true,            pro: true,             unlimited: true             },
-				{ label: 'Execution log',          sub: 'Input, output, and state diff per run',         free: true,            pro: true,             unlimited: true             },
-				{ label: 'State history',          sub: 'Versioned contract state after every execution',free: true,            pro: true,             unlimited: true             },
+				{ label: 'Unlimited hosted contracts',  sub: 'Deploy and manage as many WASM contracts as you need',          free: false, pro: true,  unlimited: true  },
+				{ label: 'Managed callback server',     sub: 'We register and run the execution server on your node',         free: true,  pro: true,  unlimited: true  },
+				{ label: 'Full execution log',          sub: 'Input, output, and state diff captured on every run',           free: true,  pro: true,  unlimited: true  },
+				{ label: 'State history per execution', sub: 'Contract state versioned and queryable after every call',       free: true,  pro: true,  unlimited: true  },
 			]
 		},
 		{
 			group: 'Non-Custodial Signing',
 			rows: [
-				{ label: 'BIP-39 key generation',  sub: '12-word mnemonic generated in your browser',   free: true,            pro: true,             unlimited: true             },
-				{ label: 'In-browser signing',     sub: 'Every transaction signed before submission',    free: true,            pro: true,             unlimited: true             },
-				{ label: 'Keys stay in browser',   sub: 'Private key never transmitted to our servers',  free: true,            pro: true,             unlimited: true             },
+				{ label: 'BIP-39 key generation',       sub: '12-word mnemonic generated entirely in your browser',          free: true,  pro: true,  unlimited: true  },
+				{ label: 'In-browser transaction signing', sub: 'Transactions signed client-side before any submission',      free: true,  pro: true,  unlimited: true  },
+				{ label: 'Private key never transmitted', sub: 'We cannot sign on your behalf — ever',                       free: true,  pro: true,  unlimited: true  },
+			]
+		},
+		{
+			group: 'Support',
+			rows: [
+				{ label: 'Community Telegram',          sub: 'Access to the node3.cloud community channel',                  free: true,  pro: true,  unlimited: true  },
+				{ label: 'Priority Telegram support',   sub: 'Direct support from the team with faster response times',      free: false, pro: true,  unlimited: true  },
 			]
 		},
 	];
