@@ -1,7 +1,16 @@
 @import 'tailwindcss';
 
-/* Chakra Petch for digits only — unicode-range makes it slot into JetBrains Mono
-   automatically for any character in U+0030-0039 (0-9), no component changes needed */
+/* ── Elms Sans (primary UI font) ─────────────────────────────────────────── */
+@font-face {
+	font-family: 'Elms Sans';
+	src: url(https://fonts.gstatic.com/s/elmssans/v7/q5uFsoS_Lf9xv7Su1FpIBj5eiYQ.woff2) format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+/* ── Chakra Petch for digits — registered under both font families ────────── */
+/* JetBrains Mono (inputs, code) */
 @font-face {
 	font-family: 'JetBrains Mono';
 	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeNIhFRZXC3Ac.woff2) format('woff2');
@@ -42,6 +51,47 @@
 	font-display: swap;
 	unicode-range: U+0030-0039;
 }
+/* Elms Sans (UI text) — same Chakra Petch numeric override */
+@font-face {
+	font-family: 'Elms Sans';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeNIhFRZXC3Ac.woff2) format('woff2');
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'Elms Sans';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIf6MapbsEk7TDLdtEz1BwkmnaBnSL8.woff2) format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'Elms Sans';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkebIlFRZXC3Ac.woff2) format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'Elms Sans';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeQI5FRZXC3Ac.woff2) format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'Elms Sans';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeJI9FRZXC3Ac.woff2) format('woff2');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
 
 @theme {
 	--color-bg: #0a0a0f;
@@ -59,13 +109,14 @@
 	--color-green: #4ade80;
 	--color-red: #f87171;
 	--color-yellow: #fbbf24;
+	--font-sans: 'Elms Sans', sans-serif;
 	--font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', ui-monospace, monospace;
 }
 
 html {
 	background: var(--color-bg);
 	color: var(--color-text);
-	font-family: var(--font-mono);
+	font-family: var(--font-sans);
 }
 
 body {
@@ -75,6 +126,10 @@ body {
 
 ::selection {
 	background: var(--color-accent-dim);
+}
+
+code, pre, kbd {
+	font-family: var(--font-mono);
 }
 
 input, textarea, select {
@@ -98,7 +153,7 @@ textarea {
 }
 
 button {
-	font-family: var(--font-mono);
+	font-family: var(--font-sans);
 	cursor: pointer;
 }
 
