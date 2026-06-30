@@ -1,0 +1,23 @@
+[Unit]
+Description=Rubix Shared Full-Node (node0)
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=node3
+WorkingDirectory=/opt/node3/rubix/node0
+# Ensure the working directory and WASM dir exist before the process starts.
+ExecStartPre=/bin/mkdir -p /opt/node3/rubix/node0 /opt/node3/wasm
+# rubixgoplatform defaults to port 5500 — override to match the VM's Postgres (5432).
+# Credentials must match the rubixdb role created during VM setup; see .env.example.
+ExecStart=/opt/node3/rubix/rubixgoplatform run -p node0 -n 0 -s -fullnode \
+  -dbAddress localhost \
+  -dbPort 5432 \
+  -dbUsername rubix \
+  -dbPassword rubixpass \
+  -dbName rubixdb
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

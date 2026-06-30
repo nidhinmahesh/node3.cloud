@@ -1,0 +1,16 @@
+[Unit]
+Description=Rubix Node %i
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=node3
+WorkingDirectory=/opt/node3/rubix/node%i
+ExecStart=/opt/node3/rubix/rubixgoplatform run -p node%i -n %i
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+# Usage: systemctl enable rubix-node@1  (dedicated paid node, index 1+)
+# For the shared/fullnode use rubix-node0.service, not this template.

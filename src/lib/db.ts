@@ -65,7 +65,7 @@ export async function addHistoryEntry(
 	tool: string,
 	input: Record<string, unknown>,
 	output: Record<string, unknown>
-): Promise<number> {
+): Promise<number | undefined> {
 	return db.workspace_history.add({
 		tool,
 		input,
@@ -95,7 +95,7 @@ export async function saveItem(
 	tool: string,
 	data: Record<string, unknown>,
 	tags: string[] = []
-): Promise<number> {
+): Promise<number | undefined> {
 	return db.saved_items.add({
 		label,
 		tool,

@@ -1,0 +1,137 @@
+version: "3.9"
+
+# ── node3.cloud production stack ─────────────────────────────────────────────
+#
+# Before first run:
+#   1. cp .env.example .env  and fill in every value
+#   2. Place mainnet swarm.key at ./rubix-node/swarm.key  (never commit this)
+#   3. Obtain TLS certs: certbot certonly --standalone -d node3.cloud
+#   4. docker compose build
+#   5. docker compose up -d
+#
+# To upgrade the rubix node binary:
+#   docker compose build --build-arg RUBIX_BRANCH=<new-tag> node0
+#   docker compose up -d node0
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  pg_data:
+  node0_data:
+  wasm_data:
+  certbot_www:
+
+services:
+
+  # ── Postgres ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    networks: [internal]
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:       ${POSTGRES_DB}
+      # Passed into init.sh so it knows what to name the rubix database.
+      RUBIX_DB:          ${RUBIX_DB}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  # ── Rubix node (node0 — shared free-tier + fullnode) ─────────────────────
+  # rubixgoplatform is cloned from GitHub at image build time.
+  # P2P ports must be reachable from the internet for consensus.
+  node0:
+    build:
+      context: ./rubix-node
+      dockerfile: Dockerfile
+      args:
+        RUBIX_BRANCH: ${RUBIX_BRANCH:-release-v1}
+    restart: unless-stopped
+    networks: [internal]
+    environment:
+      NODE_INDEX:  "0"
+      DB_HOST:     postgres
+      DB_PORT:     "5432"
+      DB_USER:     ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME:     ${RUBIX_DB}
+    volumes:
+      - node0_data:/app/node0
+      # Mount the swarm.key at a well-known path; entrypoint.sh copies it
+      # into the IPFS repo dir automatically on first start.
+      - ./rubix-node/swarm.key:/run/secrets/swarm_key:ro
+    ports:
+      # P2P — must be open in the VM firewall / security group.
+      - "21000:21000"
+      - "22000:22000"
+      - "4002:4002"
+      # Node HTTP API is internal only — NOT exposed to the host.
+    expose:
+      - "20000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Platform Go service ───────────────────────────────────────────────────
+  platform:
+    build:
+      context: ./platform
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks: [internal]
+    environment:
+      PORT:                 "8080"
+      DATABASE_URL:         postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      RUBIX_DATABASE_URL:   postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${RUBIX_DB}?sslmode=disable
+      TELEGRAM_BOT_TOKEN:   ${TELEGRAM_BOT_TOKEN}
+      LEMON_WEBHOOK_SECRET: ${LEMON_WEBHOOK_SECRET}
+      LEMON_API_KEY:        ${LEMON_API_KEY}
+      LEMON_VARIANT_ID:     ${LEMON_VARIANT_ID}
+      PLATFORM_URL:         ${PLATFORM_URL}
+      SERVER_SECRET:        ${SERVER_SECRET}
+      CALLBACK_SECRET:      ${CALLBACK_SECRET}
+      WASM_DIR:             /wasm
+      # Tells nodeutil.URL() to resolve rubixgoplatform via Docker service name.
+      RUBIX_NODE_HOST:      node0
+    volumes:
+      - wasm_data:/wasm
+    expose:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      node0:
+        condition: service_started
+
+  # ── nginx (reverse proxy + static portal) ────────────────────────────────
+  # Static portal files are baked into this image at build time.
+  # To redeploy just the portal without touching the Go service:
+  #   docker compose build --build-arg VITE_TELEGRAM_BOT=<bot> nginx
+  #   docker compose up -d nginx
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+      args:
+        VITE_TELEGRAM_BOT: ${VITE_TELEGRAM_BOT}
+    restart: unless-stopped
+    networks: [internal]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Let's Encrypt certs — generated on the host with certbot, read-only here.
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Webroot for ACME HTTP-01 challenges (certbot --webroot).
+      - certbot_www:/var/www/certbot:ro
+    depends_on:
+      - platform

@@ -1,0 +1,31 @@
+# ── Stage 1: Build SvelteKit portal (adapter-static) ─────────────────────────
+FROM node:20-alpine AS portal-builder
+
+WORKDIR /portal
+
+# Layer-cache package installs separately from source.
+COPY package.json package-lock.json ./
+RUN npm ci --prefer-offline
+
+# VITE_* vars are baked into the JS bundle at build time.
+ARG VITE_TELEGRAM_BOT
+ENV VITE_TELEGRAM_BOT=$VITE_TELEGRAM_BOT
+
+COPY . .
+RUN npm run build
+# Output: /portal/build/
+
+# ── Stage 2: nginx with embedded static portal files ─────────────────────────
+FROM nginx:1.27-alpine
+
+# Static SPA files.
+COPY --from=portal-builder /portal/build /usr/share/nginx/html
+
+# Docker-aware nginx config (proxies to "platform:8080" by service name).
+COPY infra/nginx/nginx.docker.conf     /etc/nginx/conf.d/default.conf
+COPY infra/nginx/docker-entrypoint.sh  /docker-entrypoint-nginx.sh
+RUN chmod +x /docker-entrypoint-nginx.sh
+
+EXPOSE 80 443
+
+ENTRYPOINT ["/docker-entrypoint-nginx.sh"]

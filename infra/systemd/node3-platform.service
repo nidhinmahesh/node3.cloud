@@ -1,0 +1,16 @@
+[Unit]
+Description=node3.cloud Platform Go Service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=node3
+WorkingDirectory=/opt/node3/platform
+ExecStart=/opt/node3/platform/platform
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=40
+EnvironmentFile=/opt/node3/platform/.env
+
+[Install]
+WantedBy=multi-user.target

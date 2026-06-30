@@ -1,70 +1,92 @@
 <script lang="ts">
-	import { workspace, tools, categories, type ToolId } from '$lib/stores.svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { auth } from '$lib/auth.svelte';
 
-	function grouped() {
-		const map = new Map<string, typeof tools>();
-		for (const cat of categories) {
-			map.set(cat, tools.filter((t) => t.category === cat));
-		}
-		return map;
+	let { open = $bindable(false) }: { open?: boolean } = $props();
+
+	const links = [
+		{ href: '/dashboard', label: 'dashboard' },
+		{ href: '/keys', label: 'api keys' },
+		{ href: '/webhooks', label: 'webhooks' },
+		{ href: '/contracts', label: 'contracts' },
+		{ href: '/billing', label: 'billing' }
+	];
+
+	function isActive(href: string) {
+		return $page.url.pathname === href;
 	}
 
-	function selectTool(id: ToolId) {
-		workspace.setTool(id);
-		workspace.sidebarOpen = false;
+	async function handleLogout() {
+		await auth.logout();
+		open = false;
+		goto('/');
+	}
+
+	function close() {
+		open = false;
 	}
 </script>
 
-<!-- mobile overlay backdrop -->
-{#if workspace.sidebarOpen}
-	<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+<!-- Mobile overlay backdrop -->
+{#if open}
 	<div
 		class="fixed inset-0 bg-black/50 z-40 md:hidden"
-		onclick={() => (workspace.sidebarOpen = false)}
+		onclick={close}
+		role="presentation"
 	></div>
 {/if}
 
-<aside class="flex flex-col h-full bg-bg-surface border-r border-border w-56 shrink-0
-	fixed z-50 top-0 left-0 transition-transform duration-200 md:static md:translate-x-0
-	{workspace.sidebarOpen ? 'translate-x-0' : '-translate-x-full'}">
-	<div class="px-4 py-3 border-b border-border flex items-center justify-between">
-		<h1 class="text-sm font-semibold text-accent tracking-wide">node3.cloud</h1>
+<aside class="w-48 shrink-0 flex flex-col border-r border-[--color-border] bg-[--color-bg]
+	fixed z-50 top-0 left-0 h-full transition-transform duration-200
+	md:static md:translate-x-0 md:h-auto
+	{open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}">
+	<!-- logo -->
+	<div class="px-4 py-5 border-b border-[--color-border] flex items-center justify-between">
+		<a href="/" class="text-sm font-medium text-[--color-text] hover:text-[--color-accent] transition-colors">
+			node3.cloud
+		</a>
 		<button
-			class="md:hidden text-text-muted hover:text-text text-sm"
-			onclick={() => (workspace.sidebarOpen = false)}
-		>&times;</button>
+			onclick={close}
+			class="md:hidden text-[--color-text-muted] hover:text-[--color-text] transition-colors text-lg leading-none"
+			aria-label="close menu"
+		>×</button>
 	</div>
 
-	<nav class="flex-1 overflow-y-auto py-2">
-		{#each [...grouped()] as [category, items]}
-			<div class="px-3 pt-3 pb-1">
-				<span class="text-[10px] uppercase tracking-widest text-text-muted">{category}</span>
-			</div>
-			{#each items as tool}
-				<button
-					class="w-full text-left px-4 py-1.5 text-xs transition-colors {workspace.activeTool === tool.id
-						? 'bg-bg-active text-accent'
-						: 'text-text-dim hover:bg-bg-hover hover:text-text'}"
-					onclick={() => selectTool(tool.id)}
-				>
-					{tool.name}
-				</button>
-			{/each}
+	<!-- nav -->
+	<nav class="flex-1 py-3 overflow-y-auto">
+		{#each links as link}
+			<a
+				href={link.href}
+				onclick={close}
+				class="flex items-center px-4 py-2 text-xs transition-colors
+					{isActive(link.href)
+						? 'text-[--color-text] bg-[--color-bg-active]'
+						: 'text-[--color-text-dim] hover:text-[--color-text] hover:bg-[--color-bg-hover]'}"
+			>
+				{link.label}
+			</a>
 		{/each}
 	</nav>
 
-	<div class="border-t border-border p-3 space-y-1">
-		<button
-			class="w-full text-left px-2 py-1.5 text-xs text-text-dim hover:text-text hover:bg-bg-hover rounded transition-colors"
-			onclick={() => (workspace.historyPanelOpen = !workspace.historyPanelOpen)}
-		>
-			{workspace.historyPanelOpen ? '[-] History' : '[+] History'}
-		</button>
-		<button
-			class="w-full text-left px-2 py-1.5 text-xs text-text-dim hover:text-text hover:bg-bg-hover rounded transition-colors"
-			onclick={() => (workspace.cmdkOpen = true)}
-		>
-			[/] Search
-		</button>
-	</div>
+	<!-- user footer -->
+	{#if auth.user}
+		<div class="px-4 py-4 border-t border-[--color-border]">
+			<p class="text-[10px] text-[--color-text-muted] mb-1 truncate">
+				@{auth.user.telegram_username || auth.user.telegram_id}
+			</p>
+			<p
+				class="text-[10px] text-[--color-text-muted] mb-3 truncate"
+				title={auth.user.did}
+			>
+				{auth.user.did ? auth.user.did.slice(0, 16) + '…' : '—'}
+			</p>
+			<button
+				onclick={handleLogout}
+				class="text-[10px] text-[--color-text-muted] hover:text-[--color-red] transition-colors"
+			>
+				logout
+			</button>
+		</div>
+	{/if}
 </aside>

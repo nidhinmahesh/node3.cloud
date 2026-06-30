@@ -21,3 +21,14 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Go
+platform/platform
+platform/*.test
+platform/vendor/
+
+# Rubix node — swarm.key contains the mainnet private swarm secret; never commit it
+rubix-node/swarm.key
+
+# Docker
+.docker/
