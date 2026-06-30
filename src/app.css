@@ -1,5 +1,48 @@
 @import 'tailwindcss';
 
+/* Chakra Petch for digits only — unicode-range makes it slot into JetBrains Mono
+   automatically for any character in U+0030-0039 (0-9), no component changes needed */
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeNIhFRZXC3Ac.woff2) format('woff2');
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIf6MapbsEk7TDLdtEz1BwkmnaBnSL8.woff2) format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkebIlFRZXC3Ac.woff2) format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeQI5FRZXC3Ac.woff2) format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeJI9FRZXC3Ac.woff2) format('woff2');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0030-0039;
+}
+
 @theme {
 	--color-bg: #0a0a0f;
 	--color-bg-surface: #12121a;
