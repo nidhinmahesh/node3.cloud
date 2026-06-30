@@ -111,12 +111,17 @@
 	--color-yellow: #fbbf24;
 	--font-sans: 'Stack Sans Notch', sans-serif;
 	--font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', ui-monospace, monospace;
+	/* Bump the small end of the type scale — default xs=12px sm=14px are too tight */
+	--text-xs: 0.875rem;   /* 14px */
+	--text-sm: 1rem;       /* 16px */
+	--text-base: 1.0625rem; /* 17px */
 }
 
 html {
 	background: var(--color-bg);
 	color: var(--color-text);
 	font-family: var(--font-sans);
+	font-size: 17px;
 }
 
 body {
@@ -173,4 +178,11 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
 	background: var(--color-border-bright);
+}
+
+/* Lift hardcoded 10px labels to 12px — the arbitrary value class bypasses @theme */
+@layer utilities {
+	.text-\[10px\] {
+		font-size: 0.75rem; /* 12.75px at 17px base */
+	}
 }
